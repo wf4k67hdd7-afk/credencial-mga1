@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Oficial de Verificação Ministerial - MGA</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIGURAÇÃO FÁCIL - EDITE APENAS ESTA SEÇÃO
+     ============================================================ */
+  :root {
+    /* FOTO DO MINISTRO: coloque a URL da foto aqui */
+    --foto-ministro: url('https://i.imgur.com/exemplo.jpg');
+    /* Se usar Base64, substitua pela string base64 completa */
+
+    /* CORES DO MINISTÉRIO */
+    --azul-escuro: #0a1f5c;
+    --azul-medio: #1a3a8f;
+    --dourado: #c9a227;
+    --dourado-claro: #f0c040;
+    --verde-status: #2e7d32;
+    --cinza-fundo: #f4f6fb;
+    --branco: #ffffff;
+  }
+
+  /* ============================================================
+     DADOS DO MINISTRO - EDITÁVEIS VIA JS ABAIXO
+     ============================================================ */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--cinza-fundo);
+    color: #222;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-medio) 60%, #1e4db7 100%);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0; width: 220px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='18'/%3E%3Ccircle cx='50' cy='50' r='28' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='10'/%3E%3Ccircle cx='130' cy='20' r='30' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='12'/%3E%3C/svg%3E") no-repeat center;
+    background-size: cover;
+  }
+  .header-logo {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--dourado);
+    object-fit: cover;
+    background: var(--azul-escuro);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900; font-size: 18px;
+    color: var(--dourado);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .header-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .header-text h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header-text h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 26px; font-weight: 900;
+    color: var(--branco);
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+  .header-text p {
+    font-size: 12px; color: rgba(255,255,255,0.65);
+    letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px;
+  }
+  .header-divider {
+    position: absolute; right: 40px; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, transparent, var(--dourado), transparent);
+    opacity: 0.7;
+  }
+
+  /* ── MAIN WRAPPER ── */
+  .wrapper { max-width: 820px; margin: 0 auto; padding: 24px 16px 40px; }
+
+  /* ── CARD BASE ── */
+  .card {
+    background: var(--branco);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(10,31,92,0.09);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+
+  /* ── STATUS CARD ── */
+  .status-card {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; gap: 20px;
+    border-left: 5px solid #2e7d32;
+  }
+  .status-left { display: flex; align-items: center; gap: 16px; }
+  .status-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #e8f5e9;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .status-icon svg { width: 28px; height: 28px; color: #2e7d32; }
+  .status-text h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px; font-weight: 800;
+    color: #2e7d32; letter-spacing: 0.5px;
+  }
+  .status-text p { font-size: 12.5px; color: #555; margin-top: 2px; }
+  .status-right { text-align: right; flex-shrink: 0; }
+  .status-right .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; margin-bottom: 6px; }
+  .status-right .date-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #333; margin-bottom: 3px; }
+  .status-right .date-row svg { width: 14px; height: 14px; color: #666; }
+
+  /* ── MINISTRO CARD ── */
+  .ministro-card { padding: 24px; }
+  .ministro-header { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .ministro-header svg { width: 14px; height: 14px; }
+  .ministro-grid { display: grid; grid-template-columns: 180px 1fr auto; gap: 24px; }
+
+  /* Coluna foto */
+  .foto-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .foto-frame {
+    width: 160px; height: 185px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .foto-frame img {
+    width: 100%; height: 100%; object-fit: cover;
+    /* FOTO: substitua o src da tag <img id="foto-ministro"> abaixo */
+  }
+  .situacao-badge {
+    margin-top: 10px;
+    background: var(--azul-escuro);
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-align: center;
+    width: 160px;
+  }
+  .situacao-badge .sit-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.7; }
+  .situacao-badge .sit-status {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px; font-weight: 900;
+    color: #4caf50; letter-spacing: 2px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .situacao-badge .sit-status svg { width: 18px; height: 18px; }
+
+  /* Coluna dados */
+  .dados-col {}
+  .ministro-nome {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px; font-weight: 900;
+    color: var(--azul-escuro);
+    margin-bottom: 18px;
+    line-height: 1.1;
+  }
+  .dado-item { margin-bottom: 13px; }
+  .dado-label {
+    font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #888; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .dado-label svg { width: 12px; height: 12px; }
+  .dado-valor { font-size: 14px; color: #222; font-weight: 600; }
+
+  /* Coluna QR */
+  .qr-col { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 140px; }
+  .qr-frame {
+    border: 2px solid var(--dourado);
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
+  }
+  .qr-frame img { width: 120px; height: 120px; display: block; }
+  .qr-placeholder {
+    width: 120px; height: 120px;
+    background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #aaa; text-align: center; padding: 10px;
+    border-radius: 4px;
+  }
+  .qr-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--azul-escuro); text-align: center; letter-spacing: 0.5px;
+  }
+  .qr-link { font-size: 10.5px; color: var(--azul-medio); text-align: center; line-height: 1.4; }
+  .qr-link a { color: var(--azul-medio); text-decoration: none; font-weight: 600; }
+  .qr-link a:hover { text-decoration: underline; }
+
+  /* ── REGISTRO OFICIAL CARD ── */
+  .registro-card { padding: 20px 24px; display: flex; align-items: center; gap: 20px; border-left: 5px solid var(--dourado); }
+  .registro-icon {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: var(--azul-escuro);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .registro-icon svg { width: 26px; height: 26px; color: var(--dourado); }
+  .registro-text h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 800; color: var(--azul-escuro); margin-bottom: 5px;
+  }
+  .registro-text p { font-size: 12.5px; color: #555; line-height: 1.5; }
+  .registro-assinatura { margin-left: auto; text-align: center; flex-shrink: 0; }
+  .assinatura-img { height: 45px; opacity: 0.7; display: block; margin-bottom: 4px; }
+  .assinatura-nome { font-size: 10px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 0.5px; }
+  .assinatura-cargo { font-size: 9.5px; color: #666; }
+
+  /* ── INFO CARD ── */
+  .info-card {
+    padding: 14px 20px; display: flex; align-items: flex-start; gap: 14px;
+    background: #e8f0fe; border-radius: 10px;
+  }
+  .info-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--azul-medio); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .info-icon svg { width: 16px; height: 16px; color: #fff; }
+  .info-card p { font-size: 12px; color: #333; line-height: 1.6; }
+  .info-card strong { font-weight: 700; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--azul-escuro);
+    color: rgba(255,255,255,0.8);
+    padding: 28px 32px 18px;
+    margin-top: 8px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1.2fr 1.3fr 1fr; gap: 28px; margin-bottom: 20px; }
+  .footer-brand { display: flex; flex-direction: column; gap: 10px; }
+  .footer-brand-logo { display: flex; align-items: center; gap: 10px; }
+  .footer-logo-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 2px solid var(--dourado);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 11px;
+    color: var(--dourado); flex-shrink: 0; overflow: hidden;
+  }
+  .footer-logo-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .footer-brand-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; color: #fff; }
+  .footer-slogan { font-size: 11px; color: var(--dourado-claro); font-style: italic; line-height: 1.4; }
+  .footer-verse { font-size: 10px; color: rgba(255,255,255,0.5); }
+  .footer-col h5 { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { font-size: 11.5px; margin-bottom: 5px; }
+  .footer-col ul li a { color: rgba(255,255,255,0.65); text-decoration: none; }
+  .footer-col ul li a:hover { color: var(--dourado-claro); }
+  .footer-contact-item { display: flex; align-items: flex-start; gap: 7px; font-size: 11.5px; margin-bottom: 6px; color: rgba(255,255,255,0.65); }
+  .footer-contact-item svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; color: var(--dourado); }
+  .footer-social { display: flex; gap: 8px; margin-top: 8px; }
+  .footer-social a { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 12px; font-weight: 700; }
+  .footer-social a:hover { background: var(--dourado); }
+  .footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 12px 0; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: rgba(255,255,255,0.4); }
+
+  /* ── BOTÃO DE EDIÇÃO (opcional, pode remover) ── */
+  .edit-btn {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--dourado);
+    color: var(--azul-escuro);
+    border: none; border-radius: 50px;
+    padding: 12px 22px; font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.2s;
+    z-index: 99;
+  }
+  .edit-btn:hover { transform: scale(1.05); }
+
+  /* Modal de edição */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 28px; width: 90%; max-width: 500px;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+  .modal h3 { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; color: var(--azul-escuro); margin-bottom: 20px; }
+  .modal label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 4px; margin-top: 12px; }
+  .modal input, .modal textarea {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 6px;
+    font-family: 'Open Sans', sans-serif; font-size: 13px; color: #333;
+    transition: border-color 0.2s;
+  }
+  .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--azul-medio); }
+  .modal textarea { resize: vertical; min-height: 60px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-salvar {
+    flex: 1; background: var(--azul-escuro); color: #fff;
+    border: none; border-radius: 6px; padding: 11px;
+    font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-salvar:hover { background: var(--azul-medio); }
+  .btn-cancelar {
+    background: #f0f0f0; color: #555; border: none; border-radius: 6px; padding: 11px 18px;
+    font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer;
+  }
+
+  /* RESPONSIVO */
+  @media (max-width: 640px) {
+    .ministro-grid { grid-template-columns: 1fr; }
+    .qr-col { flex-direction: row; align-items: flex-start; flex-wrap: wrap; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .registro-assinatura { display: none; }
+    .header-text h2 { font-size: 18px; }
+    .status-right { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header class="header">
+  <div class="header-logo" id="header-logo-box">
+    <img id="logo-img" src="" alt="MGA" onerror="this.style.display='none';this.parentElement.textContent='MGA'">
+  </div>
+  <div class="header-text">
+    <h1>Sistema Oficial de</h1>
+    <h2>Verificação Ministerial</h2>
+    <p id="nome-ministerio-header">Ministério Graça e Apostolado</p>
+  </div>
+  <div class="header-divider"></div>
+</header>
+
+<!-- ══════════════════════════════════════
+     CONTEÚDO PRINCIPAL
+══════════════════════════════════════ -->
+<div class="wrapper">
+
+  <!-- Status -->
+  <div class="card">
+    <div class="status-card">
+      <div class="status-left">
+        <div class="status-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="status-text">
+          <h3>✦ CREDENCIAL VERIFICADA</h3>
+          <p>Esta credencial é autêntica e o ministro está devidamente registrado em nosso ministério.</p>
+        </div>
+      </div>
+      <div class="status-right">
+        <div class="label">Última Verificação</div>
+        <div class="date-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="data-verificacao">—</span>
+        </div>
+        <div class="date-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="hora-verificacao">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dados do Ministro -->
+  <div class="card">
+    <div class="ministro-card">
+      <div class="ministro-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Dados do Ministro
+      </div>
+      <div class="ministro-grid">
+        <!-- Foto -->
+        <div class="foto-col">
+          <div class="foto-frame">
+            <img id="foto-ministro" src="https://via.placeholder.com/160x185/e0e0e0/999?text=Foto" alt="Foto do Ministro">
+          </div>
+          <div class="situacao-badge">
+            <div class="sit-label">Situação da Credencial</div>
+            <div class="sit-status">
+              ATIVA
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados -->
+        <div class="dados-col">
+          <div class="ministro-nome" id="nome-ministro">PR. JOÃO DA SILVA</div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Cargo Ministerial
+            </div>
+            <div class="dado-valor" id="cargo-ministerial">Pastor Presidente</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Igreja / Sede
+            </div>
+            <div class="dado-valor" id="igreja-sede">Igreja Ministério Graça e Apostolado</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Data de Ordenação
+            </div>
+            <div class="dado-valor" id="data-ordenacao">15 de Março de 2015</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Número da Credencial
+            </div>
+            <div class="dado-valor" id="numero-credencial">MGA-2026-001</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Validade
+            </div>
+            <div class="dado-valor" id="validade">31 de Dezembro de 2028</div>
+          </div>
+
+          <div class="dado-item">
+            <div class="dado-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Autoridade Emissora
+            </div>
+            <div class="dado-valor" id="autoridade-emissora">Presidência Geral<br>Ministério Graça e Apostolado</div>
+          </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-col">
+          <div class="qr-frame">
+            <img id="qr-img" src="" alt="QR Code" onerror="this.style.display='none'">
+            <div class="qr-placeholder" id="qr-placeholder">QR Code<br>(substitua pela<br>imagem do QR)</div>
+          </div>
+          <div class="qr-label">ESCANEIE PARA VALIDAR</div>
+          <div class="qr-link">
+            ou acesse<br>
+            <a id="link-validar" href="#">mgaapostolado.com.br/validar</a><br>
+            e informe o número da credencial.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registro Oficial -->
+  <div class="card">
+    <div class="registro-card">
+      <div class="registro-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="registro-text">
+        <h4>REGISTRO OFICIAL</h4>
+        <p>Este ministro encontra-se devidamente registrado junto ao Ministério Graça e Apostolado, estando autorizado a exercer suas funções ministeriais conforme os princípios e doutrinas estabelecidos por nossa instituição.</p>
+      </div>
+      <div class="registro-assinatura">
+        <!-- Substitua o SVG abaixo por uma imagem PNG da assinatura -->
+        <svg class="assinatura-img" viewBox="0 0 160 50" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 35 C30 10, 50 40, 70 20 C90 5, 100 38, 120 25 C135 15, 145 30, 155 28" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="assinatura-nome">Presidência Geral</div>
+        <div class="assinatura-cargo" id="nome-ministerio-assinatura">Ministério Graça e Apostolado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-card">
+    <div class="info-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <p>A autenticidade desta credencial pode ser confirmada a qualquer momento através do QR Code ou do número da credencial.<br><strong>Em caso de dúvidas, entre em contato conosco pelos canais oficiais.</strong></p>
+  </div>
+
+</div><!-- /wrapper -->
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-brand-logo">
+        <div class="footer-logo-circle">
+          <img src="" alt="MGA" onerror="this.style.display='none';this.parentElement.textContent='MGA'">
+        </div>
+        <div>
+          <div class="footer-brand-name" id="nome-ministerio-footer">MINISTÉRIO GRAÇA<br>E APOSTOLADO</div>
+        </div>
+      </div>
+      <div class="footer-slogan" id="slogan-ministerio">Ide por todo o mundo, pregai o evangelho a toda criatura.</div>
+      <div class="footer-verse">Marcos 16:15</div>
+    </div>
+    <div class="footer-col">
+      <h5>Links Úteis</h5>
+      <ul>
+        <li><a href="#">Página Inicial</a></li>
+        <li><a href="#">Sobre o Ministério</a></li>
+        <li><a href="#">Doutrina</a></li>
+        <li><a href="#">Eventos</a></li>
+        <li><a href="#">Fale Conosco</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contato</h5>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span id="footer-telefone">(11) 90000-0000</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span id="footer-email">contato@mgaapostolado.com.br</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="footer-site">www.mgaapostolado.com.br</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span id="footer-sede">São Paulo – SP – Brasil</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Siga-nos</h5>
+      <div class="footer-social">
+        <a href="#" title="Facebook">f</a>
+        <a href="#" title="Instagram">in</a>
+        <a href="#" title="YouTube">▶</a>
+      </div>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">
+    <span>🔒 Todos os direitos reservados ao <span id="footer-ministerio-nome">Ministério Graça e Apostolado</span></span>
+    <span>Versão 1.0 – Sistema de Verificação Oficial</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     BOTÃO DE EDIÇÃO RÁPIDA
+══════════════════════════════════════ -->
+<button class="edit-btn" onclick="abrirModal()">
+  ✏️ Editar Dados
+</button>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>✏️ Editar Credencial</h3>
+
+    <label>Nome completo do Ministro (ex: PR. JOÃO DA SILVA)</label>
+    <input type="text" id="inp-nome" placeholder="PR. JOÃO DA SILVA">
+
+    <label>Cargo Ministerial</label>
+    <input type="text" id="inp-cargo" placeholder="Pastor Presidente">
+
+    <label>Igreja / Sede</label>
+    <input type="text" id="inp-igreja" placeholder="Igreja Ministério Graça e Apostolado">
+
+    <label>Data de Ordenação</label>
+    <input type="text" id="inp-ordenacao" placeholder="15 de Março de 2015">
+
+    <label>Número da Credencial</label>
+    <input type="text" id="inp-credencial" placeholder="MGA-2026-001">
+
+    <label>Validade</label>
+    <input type="text" id="inp-validade" placeholder="31 de Dezembro de 2028">
+
+    <label>Autoridade Emissora</label>
+    <textarea id="inp-autoridade" placeholder="Presidência Geral&#10;Ministério Graça e Apostolado"></textarea>
+
+    <label>URL da Foto do Ministro (link direto para imagem)</label>
+    <input type="text" id="inp-foto" placeholder="https://...">
+
+    <label>URL do QR Code (link direto para imagem do QR)</label>
+    <input type="text" id="inp-qr" placeholder="https://...">
+
+    <label>URL de validação (link ao clicar no QR)</label>
+    <input type="text" id="inp-link-validar" placeholder="https://mgaapostolado.com.br/validar">
+
+    <div class="modal-actions">
+      <button class="btn-salvar" onclick="salvarDados()">✅ Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCRIPT
+══════════════════════════════════════ -->
+<script>
+/* =========================================================
+   DADOS PADRÃO — EDITE AQUI PARA MUDAR SEM ABRIR O MODAL
+   ========================================================= */
+const dadosPadrao = {
+  nome:        "PR. JOÃO DA SILVA",
+  cargo:       "Pastor Presidente",
+  igreja:      "Igreja Ministério Graça e Apostolado",
+  ordenacao:   "15 de Março de 2015",
+  credencial:  "MGA-2026-001",
+  validade:    "31 de Dezembro de 2028",
+  autoridade:  "Presidência Geral\nMinistério Graça e Apostolado",
+  foto:        "",   // ← Cole a URL da foto aqui
+  qr:          "",   // ← Cole a URL do QR code aqui
+  linkValidar: "https://mgaapostolado.com.br/validar"
+};
+
+/* ========= Funções ========= */
+function aplicarDados(d) {
+  setText("nome-ministro",       d.nome);
+  setText("cargo-ministerial",   d.cargo);
+  setText("igreja-sede",         d.igreja);
+  setText("data-ordenacao",      d.ordenacao);
+  setText("numero-credencial",   d.credencial);
+  setText("validade",            d.validade);
+  document.getElementById("autoridade-emissora").innerHTML = (d.autoridade || "").replace(/\n/g, "<br>");
+
+  if (d.foto) {
+    const img = document.getElementById("foto-ministro");
+    img.src = d.foto;
+  }
+  if (d.qr) {
+    const qrImg = document.getElementById("qr-img");
+    const qrPh  = document.getElementById("qr-placeholder");
+    qrImg.src = d.qr;
+    qrImg.style.display = "block";
+    qrImg.onload = () => { qrPh.style.display = "none"; };
+  }
+  if (d.linkValidar) {
+    const el = document.getElementById("link-validar");
+    el.href = d.linkValidar;
+    el.textContent = d.linkValidar.replace(/^https?:\/\//, "");
+  }
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el && val) el.textContent = val;
+}
+
+function atualizarDataHora() {
+  const agora = new Date();
+  const opts = { day: "2-digit", month: "long", year: "numeric" };
+  document.getElementById("data-verificacao").textContent = agora.toLocaleDateString("pt-BR", opts);
+  document.getElementById("hora-verificacao").textContent = agora.toLocaleTimeString("pt-BR");
+}
+
+function abrirModal() {
+  const d = dadosPadrao;
+  document.getElementById("inp-nome").value       = document.getElementById("nome-ministro").textContent;
+  document.getElementById("inp-cargo").value      = document.getElementById("cargo-ministerial").textContent;
+  document.getElementById("inp-igreja").value     = document.getElementById("igreja-sede").textContent;
+  document.getElementById("inp-ordenacao").value  = document.getElementById("data-ordenacao").textContent;
+  document.getElementById("inp-credencial").value = document.getElementById("numero-credencial").textContent;
+  document.getElementById("inp-validade").value   = document.getElementById("validade").textContent;
+  document.getElementById("inp-autoridade").value = document.getElementById("inp-autoridade").value || d.autoridade;
+  document.getElementById("inp-foto").value       = document.getElementById("foto-ministro").src || "";
+  document.getElementById("inp-link-validar").value = document.getElementById("link-validar").href || "";
+  document.getElementById("modal").classList.add("open");
+}
+
+function fecharModal() {
+  document.getElementById("modal").classList.remove("open");
+}
+
+function salvarDados() {
+  const novo = {
+    nome:        document.getElementById("inp-nome").value,
+    cargo:       document.getElementById("inp-cargo").value,
+    igreja:      document.getElementById("inp-igreja").value,
+    ordenacao:   document.getElementById("inp-ordenacao").value,
+    credencial:  document.getElementById("inp-credencial").value,
+    validade:    document.getElementById("inp-validade").value,
+    autoridade:  document.getElementById("inp-autoridade").value,
+    foto:        document.getElementById("inp-foto").value,
+    qr:          document.getElementById("inp-qr").value,
+    linkValidar: document.getElementById("inp-link-validar").value,
+  };
+  aplicarDados(novo);
+  fecharModal();
+}
+
+/* Fecha modal clicando fora */
+document.getElementById("modal").addEventListener("click", function(e) {
+  if (e.target === this) fecharModal();
+});
+
+/* ========= INICIALIZAÇÃO ========= */
+aplicarDados(dadosPadrao);
+atualizarDataHora();
+setInterval(atualizarDataHora, 30000);
+</script>
+
+</body>
+</html>
